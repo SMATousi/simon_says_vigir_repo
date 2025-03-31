@@ -120,8 +120,8 @@ def main(args=None):
     rclpy.init(args=args)
 
     # Path to your cleaned JSON file:
-    root_path = "/root/dev_ws/data"
-    file_name = "cleared2.json"
+    root_path = "/root/dev_stack_ws/data"
+    file_name = "cleaned_test1.json"
     trajectory_file = os.path.join(root_path, file_name)
 
     node = CartesianTrajectoryWithCamera(trajectory_file)
