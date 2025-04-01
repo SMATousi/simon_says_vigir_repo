@@ -25,6 +25,7 @@ def process_trajectory(input_file, output_file):
 
     cleaned_frames = []
     previous_frame = None
+    frame_number = 1  # Initialize frame counter
 
     for frame in trajectory:
         position = frame["pose"]["position"]
@@ -52,7 +53,7 @@ def process_trajectory(input_file, output_file):
             # Check if there's movement (position or finger change)
             if any(abs(v) > 1e-6 for v in delta_position.values()) or any(abs(v) > 0 for v in delta_fingers.values()):
                 cleaned_frames.append({
-                    "frame": frame["timestamp"],
+                    "frame": frame_number,  # Use sequential frame number instead of timestamp
                     "position": position,
                     "orientation": orientation,
                     "fingers": fingers,
@@ -60,6 +61,7 @@ def process_trajectory(input_file, output_file):
                     "delta_orientation_rpy": delta_orientation_rpy,  # Roll, pitch, yaw
                     "delta_fingers": delta_fingers
                 })
+                frame_number += 1  # Increment frame counter
 
         previous_frame = frame
 
@@ -68,6 +70,7 @@ def process_trajectory(input_file, output_file):
         json.dump(cleaned_frames, f, indent=4)
 
     print(f"Processed trajectory saved to: {output_file}")
+    print(f"Total frames after cleaning: {frame_number - 1}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Clean trajectory and compute deltas.")
