@@ -177,7 +177,7 @@ class CartesianTrajectoryWithCamera(Node):
             self.start_pub.publish(start_msg)
             self.get_logger().info(f'Started camera {serial}')
 
-            time.sleep(2.0)  # Wait for camera to initialize
+            time.sleep(1.0)  # Wait for camera to initialize
 
             # Save both RGB and depth images
             self.save_images(frame_name, serial)
@@ -188,7 +188,7 @@ class CartesianTrajectoryWithCamera(Node):
             self.end_pub.publish(end_msg)
             self.get_logger().info(f'Ended camera {serial}')
 
-            time.sleep(2.0)  # Wait before next camera
+            time.sleep(1.0)  # Wait before next camera
 
         # Wait briefly to ensure movement is complete
         time.sleep(1.0)
