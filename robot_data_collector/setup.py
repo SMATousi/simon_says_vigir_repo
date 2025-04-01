@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
 		'capture_node = robot_data_collector.capture_node:main',
+                'camera_manager = robot_data_collector.camera_manager_node:main',
         ],
     },
 )
