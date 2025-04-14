@@ -7,7 +7,7 @@ from std_msgs.msg import Float32MultiArray
 from builtin_interfaces.msg import Time
 from kinova_msgs.action import ArmPose
 from std_msgs.msg import Header
-from geometry_msgs.msg import Point, Quaternion
+from geometry_msgs.msg import Point, Quaternion, PoseStamped
 from kinova_msgs.action import SetFingersPosition
 import numpy as np
 from scipy.spatial.transform import Rotation as R
@@ -32,11 +32,28 @@ class PredictionFollower(Node):
         )
         self.get_logger().info('Subscribed to /predicted_actions')
 
-        # Initialize absolute pose (could be from parameters or a fixed pose)
-        self.current_position = np.array([0.0, 0.0, 0.0])  # meters
-        self.current_orientation = R.from_quat([0.0, 0.0, 0.0, 1.0])  # quaternion (x, y, z, w)
+        self.pose_initialized = False
+        self.pose_subscription = self.create_subscription(
+            PoseStamped,
+            '/m1n6s200_driver/out/tool_pose',
+            self.pose_callback,
+            qos_profile_sensor_data
+        )
+        self.get_logger().info('Subscribed to /m1n6s200_driver/out/tool_pose for initial pose.')
+
+    def pose_callback(self, msg):
+        pos = msg.pose.position
+        quat = msg.pose.orientation
+        self.current_position = np.array([pos.x, pos.y, pos.z])
+        self.current_orientation = R.from_quat([quat.x, quat.y, quat.z, quat.w])
+        if not self.pose_initialized:
+            self.get_logger().info(f'Initial robot pose set to position: {self.current_position}, orientation: {[quat.x, quat.y, quat.z, quat.w]}')
+            self.pose_initialized = True
 
     def prediction_callback(self, msg):
+        if not self.pose_initialized:
+            self.get_logger().warn('Prediction received before initial pose was set. Ignoring.')
+            return
         self.get_logger().info(f'Callback triggered! Received message on /predicted_actions.')
         data = msg.data
         self.get_logger().info(f'Message data: {data}, length: {len(data)}')
@@ -55,7 +72,7 @@ class PredictionFollower(Node):
         self.current_position += delta_pos
         # Fingers
         finger_val = data[6]
-        finger_cmd = float(finger_val * 5000)
+        finger_cmd = float(finger_val * 3000)
         # Prepare pose and orientation dicts
         pos_dict = {
             'x': float(self.current_position[0]),
