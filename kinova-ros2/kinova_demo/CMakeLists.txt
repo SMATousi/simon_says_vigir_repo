@@ -68,6 +68,7 @@ install(PROGRAMS
   ros2_nodes/go_home.py
   ros2_nodes/follow_traj.py
   ros2_nodes/follow_traj_with_camera.py
+  ros2_nodes/follow_predictions.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
