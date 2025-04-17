@@ -67,12 +67,15 @@ class PredictionFollower(Node):
         # Delta quaternion
         delta_quat = R.from_euler('xyz', delta_rpy).as_quat()  # [x, y, z, w]
         # Update absolute orientation
-        self.current_orientation = self.current_orientation * R.from_quat(delta_quat)
+        self.current_orientation =  self.current_orientation * R.from_quat(delta_quat)
         # Update absolute position
-        self.current_position += delta_pos
+        self.current_position -= delta_pos
         # Fingers
         finger_val = data[6]
-        finger_cmd = float(finger_val * 3000)
+        finger_cmd = float(finger_val * 5000)
+        # finger_val = float(finger_val)
+        finger_cmd = max(1000.0, finger_cmd)
+        
         # Prepare pose and orientation dicts
         pos_dict = {
             'x': float(self.current_position[0]),
