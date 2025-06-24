@@ -61,15 +61,15 @@ class PredictionFollower(Node):
             self.get_logger().error('Received prediction with insufficient data length.')
             return
         # Delta position
-        delta_pos = np.array(data[0:3])*5
+        delta_pos = np.array(data[0:3])*100
         # Delta orientation in RPY (radians)
-        delta_rpy = np.array(data[3:6])/2
+        delta_rpy = np.array(data[3:6])
         # Delta quaternion
         delta_quat = R.from_euler('xyz', delta_rpy).as_quat()  # [x, y, z, w]
         # Update absolute orientation
         self.current_orientation =  self.current_orientation * R.from_quat(delta_quat)
         # Update absolute position
-        self.current_position -= delta_pos
+        self.current_position += delta_pos
         # Fingers
         finger_val = data[6]
         finger_cmd = float(finger_val * 5000)
